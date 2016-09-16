@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		05F15DAD1D1CA05700BF1756 /* BlockBasedTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE35D981B389E480098930D /* BlockBasedTestCase.swift */; };
 		090112C11BD851CB002EB82D /* Tuples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090112C01BD851CB002EB82D /* Tuples.swift */; };
 		090112C21BD851CB002EB82D /* Tuples.swift in Sources */ = {isa = PBXBuildFile; fileRef = 090112C01BD851CB002EB82D /* Tuples.swift */; };
 		09059C411BB20A6E00555E26 /* BasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB979A01AE2A21100158386 /* BasicTests.swift */; };
@@ -99,7 +100,6 @@
 		0DDE328B1B38BD72007C39D9 /* BasicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DB979A01AE2A21100158386 /* BasicTests.swift */; };
 		0DDE328D1B38BD72007C39D9 /* Future-TestExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DEA1BF71AE31382000E126F /* Future-TestExtensions.swift */; };
 		0DE35D9A1B389E480098930D /* BlockBasedTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE35D981B389E480098930D /* BlockBasedTestCase.swift */; };
-		0DE35D9B1B389E480098930D /* BlockBasedTestCase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE35D981B389E480098930D /* BlockBasedTestCase.swift */; };
 		0DEA1B961AE30853000E126F /* FutureKit.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DEA1B951AE30853000E126F /* FutureKit.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0DEA1BC81AE30885000E126F /* Future.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DA41FCE1ADAFE5A00B58B0B /* Future.swift */; };
 		0DEA1BC91AE30885000E126F /* Promise.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DE3AD6F1ADCBBF8000345AD /* Promise.swift */; };
@@ -184,7 +184,6 @@
 		0DA41FE21ADB483C00B58B0B /* SyncWaitHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = SyncWaitHandler.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		0DAA4C941B22B3FB0023B02C /* NSOperation+FutureKit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSOperation+FutureKit.swift"; sourceTree = "<group>"; };
 		0DB979A01AE2A21100158386 /* BasicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = BasicTests.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		0DBB33421D0F973A0092BF7B /* Cancellation.MD */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Cancellation.MD; sourceTree = "<group>"; };
 		0DBB32EF1D0F91640092BF7B /* FutureKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = FutureKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DBB32F11D0F91640092BF7B /* FutureKit watchOS.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FutureKit watchOS.h"; sourceTree = "<group>"; };
 		0DBB32F31D0F91640092BF7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -194,6 +193,7 @@
 		0DBB33051D0F919C0092BF7B /* FutureKit tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "FutureKit tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DBB330A1D0F919C0092BF7B /* FutureKit_tvOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureKit_tvOSTests.swift; sourceTree = "<group>"; };
 		0DBB330C1D0F919C0092BF7B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0DBB33421D0F973A0092BF7B /* Cancellation.MD */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = Cancellation.MD; sourceTree = "<group>"; };
 		0DDE32601B38BD27007C39D9 /* FutureKit iOS Testing App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "FutureKit iOS Testing App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DDE32631B38BD28007C39D9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0DDE32641B38BD28007C39D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -726,7 +726,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0730;
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Michael Gray";
 				TargetAttributes = {
 					0DBB32EE1D0F91640092BF7B = {
@@ -750,12 +750,14 @@
 					};
 					0DEA1BAE1AE30872000E126F = {
 						CreatedOnToolsVersion = 6.3;
+						LastSwiftMigration = 0800;
 					};
 					0DEA1BE91AE3116A000E126F = {
 						CreatedOnToolsVersion = 6.3;
 					};
 					0DEA1BFE1AE313DD000E126F = {
 						CreatedOnToolsVersion = 6.3;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -1013,9 +1015,9 @@
 			files = (
 				0DEA1C0C1AE313F3000E126F /* Future-TestExtensions.swift in Sources */,
 				0D8D9A471B36384B003FBADD /* BlockBasedTestCase.m in Sources */,
-				0DE35D9B1B389E480098930D /* BlockBasedTestCase.swift in Sources */,
 				0DEA1C041AE313DD000E126F /* FutureKit_OSX_Tests.swift in Sources */,
 				0D2C4F4B1B2A00C20090765F /* XCTestCase-Ext.swift in Sources */,
+				05F15DAD1D1CA05700BF1756 /* BlockBasedTestCase.swift in Sources */,
 				DEBDAD401B3C5A78004310B9 /* PromiseTests.swift in Sources */,
 				0DEA1C0B1AE313EF000E126F /* BasicTests.swift in Sources */,
 			);
@@ -1079,8 +1081,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1128,8 +1132,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -1149,7 +1155,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1162,6 +1168,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1184,6 +1191,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1204,6 +1212,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -1225,6 +1234,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ANALYZER_NONNULL = YES;
+				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1353,6 +1363,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1376,6 +1387,7 @@
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = NO;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -1414,6 +1426,7 @@
 				PRODUCT_NAME = FutureKit;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -1435,6 +1448,7 @@
 				PRODUCT_NAME = FutureKit;
 				SDKROOT = macosx;
 				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -1495,6 +1509,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "FutureKitTests/FutureKit OSX Tests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -1514,6 +1529,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
 				SWIFT_OBJC_BRIDGING_HEADER = "FutureKitTests/FutureKit OSX Tests-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -1536,6 +1552,7 @@
 				0DBB32F51D0F91640092BF7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0DBB330D1D0F919C0092BF7B /* Build configuration list for PBXNativeTarget "FutureKit tvOS" */ = {
 			isa = XCConfigurationList;
@@ -1544,6 +1561,7 @@
 				0DBB330F1D0F919C0092BF7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0DBB33101D0F919C0092BF7B /* Build configuration list for PBXNativeTarget "FutureKit tvOSTests" */ = {
 			isa = XCConfigurationList;
@@ -1552,6 +1570,7 @@
 				0DBB33121D0F919C0092BF7B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		0DDE327C1B38BD28007C39D9 /* Build configuration list for PBXNativeTarget "FutureKit iOS Testing App" */ = {
 			isa = XCConfigurationList;

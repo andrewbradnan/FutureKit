@@ -65,24 +65,10 @@ public enum QosCompatible : Int {
     case background
     
     /* Default QoS indicates the absence of QoS information.  Whenever possible QoS information will be inferred from other sources.  If such inference is not possible, a QoS between UserInitiated and Utility will be used. */
-    case `default`
+    case _default
     
-    var attr : DispatchQueue.Attributes {
-        switch self {
-        case .userInteractive:
-            return DispatchQueueAttributes.qosUserInteractive
-        case .userInitiated:
-            return DispatchQueueAttributes.qosUserInitiated
-        case .utility:
-            return DispatchQueueAttributes.qosUtility
-        case .background:
-            return DispatchQueueAttributes.qosBackground
-        case .default:
-            return DispatchQueueAttributes.qosDefault
-        }
-    }
     
-   var qos_class : qos_class_t {
+    var qos_class : qos_class_t {
         switch self {
         case .userInteractive:
             return QOS_CLASS_USER_INTERACTIVE
@@ -92,78 +78,55 @@ public enum QosCompatible : Int {
             return QOS_CLASS_UTILITY
         case .background:
             return QOS_CLASS_BACKGROUND
-        case .default:
+        case ._default:
             return QOS_CLASS_DEFAULT
         }
-
+        
     }
     
     var queue : DispatchQueue {
         
         switch self {
         case .userInteractive:
-            return DispatchQueue.global(attributes: .qosUserInteractive)
+            return DispatchQueue.global(qos: .userInteractive)
         case .userInitiated:
-            return DispatchQueue.global(attributes: .qosUserInitiated)
+            return DispatchQueue.global(qos: .userInitiated)
         case .utility:
-            return DispatchQueue.global(attributes: .qosUtility)
+            return DispatchQueue.global(qos: .utility)
         case .background:
-            return DispatchQueue.global(attributes: .qosBackground)
-        case .default:
-            return DispatchQueue.global(attributes: .qosDefault)
-            
+            return DispatchQueue.global(qos: .background)
+        case ._default:
+            return DispatchQueue.global(qos: .default)
         }
     }
     
     public func createQueue(_ label: String?,
-        q_attr : DispatchQueue.Attributes!,
-        relative_priority: Int32 = 0) -> DispatchQueue {
-            
-        //let qos_class = self.qos_class
-        
-        //let nq_attr = [q_attr, self.attr]
+                            q_attr : DispatchQueue.Attributes!,
+                            relative_priority: Int32 = 0) -> DispatchQueue {
         
         let q = DispatchQueue(label: label ?? "", attributes: q_attr)
         return q
     }
-
+    
     
 }
 
-private func make_dispatch_block<T>(_ q: DispatchQueue, _ block: @escaping (T) -> Void) -> ((T) -> Void) {
-    
-    let newblock = { (t:T) -> Void in
-        q.async {
-            block(t)
-        }
-    }
-    return newblock
-}
-
-private func make_dispatch_block<T>(_ q: OperationQueue, _ block: @escaping (T) -> Void) -> ((T) -> Void) {
-    
-    let newblock = { (t:T) -> Void in
-        q.addOperation({ () -> Void in
-            block(t)
-        })
-    }
-    return newblock
-}
 
 public enum SerialOrConcurrent: Int {
-    case serial
-    case concurrent
+    case Serial
+    case Concurrent
     
-    public var q_attr : DispatchQueue.Attributes! {
+    public var q_attr : DispatchQueue.Attributes {
         switch self {
-        case .serial:
-            return DispatchQueueAttributes.serial
-        case .concurrent:
-            return DispatchQueueAttributes.concurrent
+        case .Serial:
+            return DispatchQueue.Attributes()
+        case .Concurrent:
+            return .concurrent
         }
     }
     
 }
+
 
 // remove in Swift 2.0
 
@@ -174,27 +137,27 @@ extension qos_class_t {
 }
 public enum Executor {
     case primary                    // use the default configured executor.  Current set to Immediate.
-                                    // There are deep philosphical arguments about Immediate vs Async.
-                                    // So whenever we figure out what's better we will set the Primary to that!
+    // There are deep philosphical arguments about Immediate vs Async.
+    // So whenever we figure out what's better we will set the Primary to that!
     
     case main                       // will use MainAsync or MainImmediate based on MainStrategy
-
-    case async                      // Always performs an Async Dispatch to some non-main q (usually Default)
-                                    // If you want to put all of these in a custom queue, you can set AsyncStrategy to .Queue(q)
-
-    case current                    // Will try to use the current Executor.
-                                    // If the current block isn't running in an Executor, will return Main if running in the main thread, otherwise .Async
-
-    case currentAsync               // Will try to use the current Executor, but guarantees that the operation will always call a dispatch_async() before executing.
-                                    // If the current block isn't running in an Executor, will return MainAsync if running in the main thread, otherwise .Async
     
-
+    case async                      // Always performs an Async Dispatch to some non-main q (usually Default)
+    // If you want to put all of these in a custom queue, you can set AsyncStrategy to .Queue(q)
+    
+    case current                    // Will try to use the current Executor.
+    // If the current block isn't running in an Executor, will return Main if running in the main thread, otherwise .Async
+    
+    case currentAsync               // Will try to use the current Executor, but guarantees that the operation will always call a dispatch_async() before executing.
+    // If the current block isn't running in an Executor, will return MainAsync if running in the main thread, otherwise .Async
+    
+    
     case immediate                  // Never performs an Async Dispatch, Ok for simple mappings. But use with care!
     // Blocks using the Immediate executor can run in ANY Block
-
+    
     case stackCheckingImmediate     // Will try to perform immediate, but does some stack checking.  Safer than Immediate
-                                    // But is less efficient.  
-                                    // Maybe useful if an Immediate handler is somehow causing stack overflow issues
+    // But is less efficient.
+    // Maybe useful if an Immediate handler is somehow causing stack overflow issues
     
     
     case mainAsync                  // will always do a dispatch_async to the mainQ
@@ -202,16 +165,16 @@ public enum Executor {
     
     case userInteractive            // QOS_CLASS_USER_INTERACTIVE
     case userInitiated              // QOS_CLASS_USER_INITIATED
-    case `default`                    // QOS_CLASS_DEFAULT
+    case _default                   // QOS_CLASS_DEFAULT
     case utility                    // QOS_CLASS_UTILITY
     case background                 // QOS_CLASS_BACKGROUND
     
     case queue(DispatchQueue)    // Dispatch to a Queue of your choice!
-                                    // Use this for your own custom queues
+    // Use this for your own custom queues
     
     
-    case operationQueue(Foundation.OperationQueue)    // Dispatch to a Queue of your choice!
-                                             // Use this for your own custom queues
+    case operationQueue(OperationQueue)    // Dispatch to a Queue of your choice!
+    // Use this for your own custom queues
     
     case managedObjectContext(NSManagedObjectContext)   // block will run inside the managed object's context via context.performBlock()
     
@@ -242,17 +205,14 @@ public enum Executor {
             return "UserInteractive"
         case .userInitiated:
             return "UserInitiated"
-        case .default:
+        case ._default:
             return "Default"
         case .utility:
             return "Utility"
         case .background:
             return "Background"
         case let .queue(q):
-            let clabel = q.label
-            let rt = String.decodeCString(clabel, as: UTF8.self, repairingInvalidCodeUnits: false)
-            let n = rt != nil ? rt!.result : "(null)"
-            return "Queue(\(n))"
+            return "Queue(\(q.label))"
         case let .operationQueue(oq):
             let name = oq.name ?? "??"
             return "OperationQueue(\(name))"
@@ -264,13 +224,13 @@ public enum Executor {
     }
     
     public typealias CustomCallBackBlock = ((() -> Void) -> Void)
-
+    
     public static var PrimaryExecutor = Executor.current {
         willSet(newValue) {
             switch newValue {
             case .primary:
                 assertionFailure("Nope.  Nope. Nope.")
-            case .main,.mainAsync,mainImmediate:
+            case .main,.mainAsync,.mainImmediate:
                 NSLog("it's probably a bad idea to set .Primary to the Main Queue. You have been warned")
             default:
                 break
@@ -287,17 +247,17 @@ public enum Executor {
             }
         }
     }
-    public static var AsyncExecutor = Executor.default {
+    public static var AsyncExecutor = Executor._default {
         willSet(newValue) {
             switch newValue {
-            case .immediate, .stackCheckingImmediate,.mainImmediate:
+            case .immediate, .stackCheckingImmediate, .mainImmediate:
                 assertionFailure("AsyncStrategy can't be Immediate!")
             case .async, .main, .primary, .current, .currentAsync:
                 assertionFailure("Nope.  Nope. Nope. AsyncStrategy can't be .Async, .Main, .Primary, .Current!, .CurrentAsync")
             case .mainAsync:
                 NSLog("it's probably a bad idea to set .Async to the Main Queue. You have been warned")
             case let .queue(q):
-                assert(!(q !== DispatchQueue.main),"Async is not for the mainq")
+                assert(!(q !== mainQ),"Async is not for the mainq")
             default:
                 break
             }
@@ -307,7 +267,7 @@ public enum Executor {
     private static let mainQ            = DispatchQueue.main
     private static let userInteractiveQ = QosCompatible.userInteractive.queue
     private static let userInitiatedQ   = QosCompatible.userInitiated.queue
-    private static let defaultQ         = QosCompatible.default.queue
+    private static let defaultQ         = QosCompatible._default.queue
     private static let utilityQ         = QosCompatible.utility.queue
     private static let backgroundQ      = QosCompatible.background.queue
     
@@ -317,8 +277,8 @@ public enum Executor {
             self = .userInteractive
         case .userInitiated:
             self = .userInitiated
-        case .default:
-            self = .default
+        case ._default:
+            self = ._default
         case .utility:
             self = .utility
         case .background:
@@ -328,62 +288,62 @@ public enum Executor {
     
     @available(iOS 8.0, *)
     init(qos_class: qos_class_t) {
-        switch UInt64(qos_class.rawValue) {
-        case DispatchQueue.Attributes.qosUserInteractive.rawValue:
+        switch qos_class.rawValue {
+        case QOS_CLASS_USER_INTERACTIVE.rawValue:
             self = .userInteractive
-        case DispatchQueue.Attributes.qosUserInitiated.rawValue:
+        case QOS_CLASS_USER_INITIATED.rawValue:
             self = .userInitiated
-        case DispatchQueue.Attributes.qosDefault.rawValue:
-            self = .default
-        case DispatchQueue.Attributes.qosUtility.rawValue:
+        case QOS_CLASS_DEFAULT.rawValue:
+            self = ._default
+        case QOS_CLASS_UTILITY.rawValue:
             self = .utility
-        case DispatchQueue.Attributes.qosBackground.rawValue:
+        case QOS_CLASS_BACKGROUND.rawValue:
             self = .background
-        case DispatchQueue.Attributes.noQoS.rawValue:
-            self = .default
+        case QOS_CLASS_UNSPECIFIED.rawValue:
+            self = ._default
         default:
             assertionFailure("invalid argument \(qos_class)")
-            self = .default
+            self = ._default
         }
     }
     init(queue: DispatchQueue) {
         self = .queue(queue)
     }
-    init(opqueue: Foundation.OperationQueue) {
+    init(opqueue: OperationQueue) {
         self = .operationQueue(opqueue)
     }
-
-    public static func createQueue(_ label: String?,
-        type : SerialOrConcurrent,
-        qos : QosCompatible = .default,
-        relative_priority: Int32 = 0) -> Executor {
-            
-            let q = qos.createQueue(label, q_attr: type.q_attr, relative_priority: relative_priority)
-            return .queue(q)
+    
+    public static func createQueue(label: String?,
+                                   type : SerialOrConcurrent,
+                                   qos : QosCompatible = ._default,
+                                   relative_priority: Int32 = 0) -> Executor {
+        
+        let q = qos.createQueue(label, q_attr: type.q_attr, relative_priority: relative_priority)
+        return .queue(q)
     }
     
-    public static func createOperationQueue(_ name: String?,
-        maxConcurrentOperationCount : Int) -> Executor {
-            
-            let oq = Foundation.OperationQueue()
-            oq.name = name
-            return .operationQueue(oq)
-            
+    public static func createOperationQueue(name: String?,
+                                            maxConcurrentOperationCount : Int) -> Executor {
+        
+        let oq = OperationQueue()
+        oq.name = name
+        return .operationQueue(oq)
+        
     }
     
-    public static func createConcurrentQueue(_ label : String? = nil,qos : QosCompatible = .default) -> Executor  {
-        return self.createQueue(label, type: .concurrent, qos: qos, relative_priority: 0)
+    public static func createConcurrentQueue(label : String? = nil,qos : QosCompatible = ._default) -> Executor  {
+        return self.createQueue(label: label, type: .Concurrent, qos: qos, relative_priority: 0)
     }
     public static func createConcurrentQueue() -> Executor  {
-        return self.createQueue(nil, type: .concurrent, qos: .default, relative_priority: 0)
+        return self.createQueue(label: nil, type: .Concurrent, qos: ._default, relative_priority: 0)
     }
-    public static func createSerialQueue(_ label : String? = nil,qos : QosCompatible = .default) -> Executor  {
-        return self.createQueue(label, type: .serial, qos: qos, relative_priority: 0)
+    public static func createSerialQueue(label : String? = nil,qos : QosCompatible = ._default) -> Executor  {
+        return self.createQueue(label: label, type: .Serial, qos: qos, relative_priority: 0)
     }
     public static func createSerialQueue() -> Executor  {
-        return self.createQueue(nil, type: .serial, qos: .default, relative_priority: 0)
+            return self.createQueue(label: nil, type: .Serial, qos: ._default, relative_priority: 0)
     }
-
+    
     // immediately 'dispatches' and executes a block on an Executor
     // example:
     //
@@ -394,11 +354,11 @@ public enum Executor {
     
     public typealias Block = ()->Void
     public func executeBlock(block b: @escaping Block) {
-        let executionBlock = self.callbackBlockFor(b)
+        let executionBlock = self.callbackBlockFor(block: b)
         executionBlock()
     }
-
-    public func execute<__Type>(_ block: () throws -> __Type) -> Future<__Type> {
+    
+    public func execute<__Type>(block: @escaping () throws -> __Type) -> Future<__Type> {
         let p = Promise<__Type>()
         self.executeBlock { () -> Void in
             do {
@@ -412,7 +372,7 @@ public enum Executor {
         return p.future
     }
     
-    public func execute<C:CompletionType>(_ block: () throws -> C) -> Future<C.T> {
+    public func execute<C:CompletionType>(block: @escaping () throws -> C) -> Future<C.T> {
         let p = Promise<C.T>()
         self.executeBlock { () -> Void in
             do {
@@ -425,31 +385,32 @@ public enum Executor {
         }
         return p.future
     }
-
     
-    internal func _executeAfterDelay<C:CompletionType>(nanosecs n: Int64, block: @escaping () throws -> C) -> Future<C.T> {
+    
+    internal func _executeAfterDelay<C:CompletionType>(nanosecs n: UInt64, block: @escaping () throws -> C) -> Future<C.T> {
         let p = Promise<C.T>()
-        let popTime = DispatchTime.now() + Double(n) / Double(NSEC_PER_SEC)
+        let popTime = DispatchTime.now().rawValue+n
         let q = self.underlyingQueue ?? Executor.defaultQ
-        q.asynAfter(when: popTime, execute: {
+        
+        q.asyncAfter(deadline: DispatchTime(uptimeNanoseconds: popTime), execute: {
             p.completeWithBlock {
                 return try block()
             }
         })
         return p.future
     }
-    public func executeAfterDelay<C:CompletionType>(_ secs : TimeInterval,  block: @escaping () throws -> C) -> Future<C.T> {
+    public func executeAfterDelay<C:CompletionType>(secs : TimeInterval,  block: @escaping () throws -> C) -> Future<C.T> {
         let nanosecsDouble = secs * TimeInterval(NSEC_PER_SEC)
-        let nanosecs = Int64(nanosecsDouble)
+        let nanosecs = UInt64(nanosecsDouble)
         return self._executeAfterDelay(nanosecs: nanosecs,block:block)
     }
     
-    public func executeAfterDelay<__Type>(_ secs : TimeInterval,  block: () throws -> __Type) -> Future<__Type> {
-        return self.executeAfterDelay(secs) { () -> Completion<__Type> in
+    public func executeAfterDelay<__Type>(secs : TimeInterval,  block: @escaping () throws -> __Type) -> Future<__Type> {
+        return self.executeAfterDelay(secs: secs) { () -> Completion<__Type> in
             return .success(try block())
         }
     }
-
+    
     // This returns the underlyingQueue (if there is one).
     // Not all executors have an underlyingQueue.
     // .Custom will always return nil, even if the implementation may include one.
@@ -467,7 +428,7 @@ public enum Executor {
                 return Executor.userInteractiveQ
             case .userInitiated:
                 return Executor.userInitiatedQ
-            case .default:
+            case ._default:
                 return Executor.defaultQ
             case .utility:
                 return Executor.utilityQ
@@ -495,7 +456,7 @@ public enum Executor {
             if let current = getCurrentExecutor() {
                 return current
             }
-            if (Thread.isMainThread) {
+            if Thread.isMainThread {
                 return self.MainExecutor.real_executor
             }
             return .async
@@ -503,10 +464,10 @@ public enum Executor {
     }
     
     /**
-        So this will try and find the if the current code is running inside of an executor block.
-        It uses a Thread dictionary to maintain the current running Executor.
-        Will never return .Immediate, instead it will return the actual running Executor if known
-    */
+     So this will try and find the if the current code is running inside of an executor block.
+     It uses a Thread dictionary to maintain the current running Executor.
+     Will never return .Immediate, instead it will return the actual running Executor if known
+     */
     public static func getCurrentExecutor() -> Executor? {
         let threadDict = Thread.current.threadDictionary
         let r = threadDict[GLOBAL_PARMS.CURRENT_EXECUTOR_PROPERTY] as? Box<Executor>
@@ -520,10 +481,10 @@ public enum Executor {
     
     
     /**
-        Will compare to Executors.
-        warning: .Custom Executors can't be compared and will always return 'false' when compared.
-    */
-    public func isEqualTo(_ e:Executor) -> Bool {
+     Will compare to Executors.
+     warning: .Custom Executors can't be compared and will always return 'false' when compared.
+     */
+    public func isEqualTo(e:Executor) -> Bool {
         switch self {
         case .primary:
             if case .primary = e { return true } else { return false }
@@ -543,8 +504,8 @@ public enum Executor {
             if case .userInteractive = e { return true } else { return false }
         case .userInitiated:
             if case .userInitiated = e { return true } else { return false }
-        case .default:
-            if case .default = e { return true } else { return false }
+        case ._default:
+            if case ._default = e { return true } else { return false }
         case .utility:
             if case .utility = e { return true } else { return false }
         case .background:
@@ -581,12 +542,12 @@ public enum Executor {
             return false
         }
         if let e = Executor.getCurrentExecutor() {
-            return self.isEqualTo(e)
+            return self.isEqualTo(e: e)
         }
         return false
     }
     // returns the previous Executor
-    private static func setCurrentExecutor(_ e:Executor?) -> Executor? {
+    @discardableResult private static func setCurrentExecutor(e:Executor?) -> Executor? {
         let threadDict = Thread.current.threadDictionary
         let key = GLOBAL_PARMS.CURRENT_EXECUTOR_PROPERTY
         let current = threadDict[key] as? Box<Executor>
@@ -598,31 +559,31 @@ public enum Executor {
         }
         return current?.value
     }
-
-    public func callbackBlockFor<T>(_ block: @escaping (T) -> Void) -> ((T) -> Void) {
+    
+    public func callbackBlockFor<T>(block: @escaping (T) -> Void) -> ((T) -> Void) {
         
         let currentExecutor = self.real_executor
         
         switch currentExecutor {
-        case .immediate,.stackCheckingImmediate:
-            return currentExecutor.getblock_for_callbackBlockFor(block)
+        case .immediate, .stackCheckingImmediate:
+            return currentExecutor.getblock_for_callbackBlockFor(block: block)
         default:
             let wrappedBlock = { (t:T) -> Void in
-                let previous = Executor.setCurrentExecutor(currentExecutor)
+                let previous = Executor.setCurrentExecutor(e: currentExecutor)
                 block(t)
-                Executor.setCurrentExecutor(previous)
+                Executor.setCurrentExecutor(e: previous)
             }
-            return currentExecutor.getblock_for_callbackBlockFor(wrappedBlock)
+            return currentExecutor.getblock_for_callbackBlockFor(block: wrappedBlock)
         }
     }
-
     
-    /*  
-        we need to figure out what the real executor we need to guarantee that execution will happen asyncronously.
-        This maps the 'best' executor to guarantee a dispatch_async() to use given the current executor
     
-        Most executors are already async, and in that case this will return 'self'
-    */
+    /*
+     we need to figure out what the real executor we need to guarantee that execution will happen asyncronously.
+     This maps the 'best' executor to guarantee a dispatch_async() to use given the current executor
+     
+     Most executors are already async, and in that case this will return 'self'
+     */
     private var asyncExecutor : Executor {
         
         switch self {
@@ -648,8 +609,8 @@ public enum Executor {
     }
     
     /*  we need to figure out what the real executor will be used
-        'unwraps' the virtual Executors like .Primary,.Main,.Async,.Current
-    */
+     'unwraps' the virtual Executors like .Primary,.Main,.Async,.Current
+     */
     private var real_executor : Executor {
         
         switch self {
@@ -675,25 +636,25 @@ public enum Executor {
         }
     }
     
-    private func getblock_for_callbackBlockFor<T>(_ block: @escaping (T) -> Void) -> ((T) -> Void) {
+    private func getblock_for_callbackBlockFor<T>(block: @escaping (T) -> Void) -> ((T) -> Void) {
         
         switch self {
         case .primary:
-            return Executor.PrimaryExecutor.getblock_for_callbackBlockFor(block)
+            return Executor.PrimaryExecutor.getblock_for_callbackBlockFor(block: block)
         case .main:
-            return Executor.MainExecutor.getblock_for_callbackBlockFor(block)
+            return Executor.MainExecutor.getblock_for_callbackBlockFor(block: block)
         case .async:
-            return Executor.AsyncExecutor.getblock_for_callbackBlockFor(block)
+            return Executor.AsyncExecutor.getblock_for_callbackBlockFor(block: block)
             
         case .current:
-            return Executor.SmartCurrent.getblock_for_callbackBlockFor(block)
-
+            return Executor.SmartCurrent.getblock_for_callbackBlockFor(block: block)
+            
         case .currentAsync:
-            return Executor.SmartCurrent.asyncExecutor.getblock_for_callbackBlockFor(block)
-
+            return Executor.SmartCurrent.asyncExecutor.getblock_for_callbackBlockFor(block: block)
+            
         case .mainImmediate:
             let newblock = { (t:T) -> Void in
-                if (Thread.isMainThread) {
+                if Thread.isMainThread {
                     block(t)
                 }
                 else {
@@ -704,27 +665,28 @@ public enum Executor {
             }
             return newblock
         case .mainAsync:
-            return make_dispatch_block(Executor.mainQ,block)
-        case .default:
-            return make_dispatch_block(Executor.defaultQ,block)
+            return make_dispatch_block(q: Executor.mainQ, block: block)
+            
         case .userInteractive:
-            return make_dispatch_block(Executor.userInteractiveQ,block)
+            return make_dispatch_block(q: Executor.userInteractiveQ, block: block)
         case .userInitiated:
-            return make_dispatch_block(Executor.userInitiatedQ,block)
+            return make_dispatch_block(q: Executor.userInitiatedQ, block: block)
+        case ._default:
+            return make_dispatch_block(q: Executor.defaultQ, block: block)
         case .utility:
-            return make_dispatch_block(Executor.utilityQ,block)
+            return make_dispatch_block(q: Executor.utilityQ, block: block)
         case .background:
-            return make_dispatch_block(Executor.backgroundQ,block)
+            return make_dispatch_block(q: Executor.backgroundQ, block: block)
             
         case let .queue(q):
-            return make_dispatch_block(q,block)
+            return make_dispatch_block(q: q, block: block)
             
         case let .operationQueue(opQueue):
-            return make_dispatch_block(opQueue,block)
+            return make_dispatch_block(o: opQueue, block: block)
             
         case let .managedObjectContext(context):
             if (context.concurrencyType == .mainQueueConcurrencyType) {
-                return Executor.MainExecutor.getblock_for_callbackBlockFor(block)
+                return Executor.MainExecutor.getblock_for_callbackBlockFor(block: block)
             }
             else {
                 let newblock = { (t:T) -> Void in
@@ -749,7 +711,7 @@ public enum Executor {
                     currentDepth = 0
                 }
                 if (currentDepth.intValue > GLOBAL_PARMS.STACK_CHECKING_MAX_DEPTH) {
-                    let b = Executor.AsyncExecutor.callbackBlockFor(block)
+                    let b = Executor.AsyncExecutor.callbackBlockFor(block: block)
                     b(t)
                 }
                 else {
@@ -775,8 +737,30 @@ public enum Executor {
     
 }
 
+func make_dispatch_block<T>(q: DispatchQueue, block: @escaping (T) -> Void) -> ((T) -> Void) {
+    
+    let newblock = { (t:T) -> Void in
+        q.async {
+            block(t)
+        }
+    }
+    return newblock
+}
+
+private func make_dispatch_block<T>(o: OperationQueue, block: @escaping (T) -> Void) -> ((T) -> Void) {
+    
+    let newblock = { (t:T) -> Void in
+        o.addOperation({ () -> Void in
+            block(t)
+        })
+    }
+    return newblock
+}
+
+
+/*
 let example_of_a_Custom_Executor_That_Is_The_Same_As_MainAsync = Executor.custom { (callback) -> Void in
-    DispatchQueue.main.async {
+    dispatch_async(dispatch_get_main_queue()) {
         callback()
     }
 }
@@ -803,7 +787,6 @@ let example_Of_A_Custom_Executor_Where_everthing_takes_5_seconds = Executor.cust
     }
     
 }
-
-
+*/
 
 

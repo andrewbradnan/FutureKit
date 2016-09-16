@@ -34,7 +34,7 @@ class SyncWaitHandler<T>  {
     
     private var value : FutureResult<T>?
     
-    init<F:FutureProtocol where F.T == T>(waitingOnFuture f: F) {
+    init<F:FutureProtocol>(waitingOnFuture f: F) where F.T == T {
         f.onComplete { (v) -> Void in
             self.condition.lock()
             self.value = v
@@ -45,8 +45,8 @@ class SyncWaitHandler<T>  {
     
     final func waitUntilCompleted(doMainQWarning warn: Bool = true) -> FutureResult<T> {
         self.condition.lock()
-        if (warn && NSThread.isMainThread()) {
-            if (self.value == nil) {
+        if warn && Thread.isMainThread {
+            if self.value == nil {
                 warnOperationOnMainThread()
             }
         }

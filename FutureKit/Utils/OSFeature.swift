@@ -26,8 +26,8 @@ let is_ios_8_or_above = IOS_SYSTEM_VERSION_GREATER_THAN_OR_EQUAL_TO("8.0")
 
 enum OSFeature {
     
-    case NSOperationQueuePriority
-    case DispatchQueuesWithQos
+    case nsOperationQueuePriority
+    case dispatchQueuesWithQos
     
     var is_supported : Bool {
 #if os(iOS)

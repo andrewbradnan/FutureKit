@@ -20,24 +20,24 @@ public class FutureThread {
         return promise.future
     }
     
-    private var thread : NSThread!
+    private var thread : Thread!
     
-    public init(block b: () -> __Type) {
+    public init(block b: @escaping () -> __Type) {
         self.block = { () -> Completion<__Type> in
-            return .Success(b())
+            return .success(b())
         }
-        self.thread = NSThread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
+        self.thread = Thread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
     }
-    public init(block b: () -> Completion<__Type>) {
+    public init(block b: @escaping () -> Completion<__Type>) {
         self.block = b
-        self.thread = NSThread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
+        self.thread = Thread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
     }
     
-    public init(block b: () -> Future<__Type>) {
+    public init(block b: @escaping () -> Future<__Type>) {
         self.block = { () -> Completion<__Type> in
-            return .CompleteUsing(b())
+            return .completeUsing(b())
         }
-        self.thread = NSThread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
+        self.thread = Thread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
     }
     
     @objc public func thread_func() {

@@ -127,18 +127,18 @@ internal class CancellationTokenSource {
     // as long as there
     internal typealias CancellationTokenPtr = Weak<CancellationToken>
     
-    private var tokens : [CancellationTokenPtr] = []
+    fileprivate var tokens : [CancellationTokenPtr] = []
     
     // once we have triggered cancellation, we can't do it again
-    private var canBeCancelled = true
+    fileprivate var canBeCancelled = true
     
     // this is to flag that someone has made a non-forced cancel request, but we are ignoring it due to other valid tokens
     // if those tokens disappear, we will honor the cancel request then.
-    private var pendingCancelRequestActive = false
+    fileprivate var pendingCancelRequestActive = false
     
     
-    private var handler : CancellationHandler?
-    private var forcedCancellationHandler : CancellationHandler
+    fileprivate var handler : CancellationHandler?
+    fileprivate var forcedCancellationHandler : CancellationHandler
     
     init(forcedCancellationHandler h: @escaping CancellationHandler) {
         self.forcedCancellationHandler = h
@@ -193,7 +193,7 @@ internal class CancellationTokenSource {
     }
 
     
-    private func _createUntrackedToken() -> CancellationToken {
+    fileprivate func _createUntrackedToken() -> CancellationToken {
         
         return CancellationToken(
             
@@ -204,7 +204,7 @@ internal class CancellationTokenSource {
             onDeinit:nil)
        
     }
-    private func _createTrackedToken(_ synchObject : SynchronizationProtocol) -> CancellationToken {
+    fileprivate func _createTrackedToken(_ synchObject : SynchronizationProtocol) -> CancellationToken {
         
         return CancellationToken(
             
@@ -218,7 +218,7 @@ internal class CancellationTokenSource {
         
     }
     
-    private func _removeToken(_ cancelingToken:CancellationToken) {
+    fileprivate func _removeToken(_ cancelingToken:CancellationToken) {
         // so remove tokens that no longer exist and the requested token
         self.tokens = self.tokens.filter { (tokenPtr) -> Bool in
             if let token = tokenPtr.value {
@@ -231,7 +231,7 @@ internal class CancellationTokenSource {
     }
     
 
-    private func _performCancel(_ options : CancellationOptions) {
+    fileprivate func _performCancel(_ options : CancellationOptions) {
         
         if self.canBeCancelled {
             if (!options.contains(.DoNotForwardCancelRequestIfThereAreOtherFuturesWaiting)) {
@@ -253,7 +253,7 @@ internal class CancellationTokenSource {
         
     }
     
-    private func _cancelRequested(_ cancelingToken:CancellationToken, _ options : CancellationOptions,_ synchObject : SynchronizationProtocol) {
+    fileprivate func _cancelRequested(_ cancelingToken:CancellationToken, _ options : CancellationOptions,_ synchObject : SynchronizationProtocol) {
         
         synchObject.lockAndModify { () -> Void in
             self._removeToken(cancelingToken)
@@ -262,7 +262,7 @@ internal class CancellationTokenSource {
        
     }
     
-    private func _clearInitializedToken(_ token:CancellationToken,_ synchObject : SynchronizationProtocol) {
+    fileprivate func _clearInitializedToken(_ token:CancellationToken,_ synchObject : SynchronizationProtocol) {
         
         synchObject.lockAndModifySync { () -> Void in
             self._removeToken(token)
@@ -328,14 +328,14 @@ public struct CancellationOptions : OptionSet{
 
 internal typealias CancellationHandler = ((CancellationOptions) -> Void)
 
-public class CancellationToken {
+open class CancellationToken {
 
     final public func cancel(_ options : CancellationOptions = []) {
         self.onCancel?(options,self)
         self.onCancel = nil
     }
 
-    public var cancelCanBeRequested : Bool {
+    open var cancelCanBeRequested : Bool {
         return (self.onCancel != nil)
     }
 
@@ -350,8 +350,8 @@ public class CancellationToken {
     internal typealias OnCancelHandler = ((CancellationOptions,CancellationToken) -> Void)
     internal typealias OnDenitHandler = ((CancellationToken) -> Void)
 
-    private var onCancel : OnCancelHandler?
-    private var onDeinit : OnDenitHandler?
+    fileprivate var onCancel : OnCancelHandler?
+    fileprivate var onDeinit : OnDenitHandler?
     
     internal init(onCancel c:OnCancelHandler?, onDeinit d: OnDenitHandler?) {
         self.onCancel = c
@@ -455,7 +455,7 @@ public extension FutureProtocol  {
 
 
 */
-public class Future<T> : FutureProtocol {
+open class Future<T> : FutureProtocol {
     
     public typealias ReturnType = T
     
@@ -464,13 +464,13 @@ public class Future<T> : FutureProtocol {
     internal typealias cancellation_handler_type = (()-> Void)
     
     
-    private final var __callbacks : [completion_block_type]?
+    fileprivate final var __callbacks : [completion_block_type]?
 
     /**
         this is used as the internal storage for `var completion`
         it is not thread-safe to read this directly. use `var synchObject`
     */
-    private final var __result : FutureResult<T>?
+    fileprivate final var __result : FutureResult<T>?
     
 //    private final let lock = NSObject()
     
@@ -529,7 +529,7 @@ public class Future<T> : FutureProtocol {
     
     accessing this variable directly requires thread synchronization.
     */
-    public var value : T? {
+    open var value : T? {
         get {
             return self.result?.value
         }
@@ -539,7 +539,7 @@ public class Future<T> : FutureProtocol {
     
     accessing this variable directly requires thread synchronization.
     */
-    public var error : Error? {
+    open var error : Error? {
         get {
             return self.result?.error
         }
@@ -552,7 +552,7 @@ public class Future<T> : FutureProtocol {
     
     It only informs the user that this type of future can be cancelled.
     */
-    public var cancellationIsSupported : Bool {
+    open var cancellationIsSupported : Bool {
         return self.synchObject.lockAndReadSync { () -> Bool in
             return (self.cancellationSource.cancellationIsSupported)
         }
@@ -563,7 +563,7 @@ public class Future<T> : FutureProtocol {
     
     is NOT threadsafe
     */
-    private final var __isCompleted : Bool {
+    fileprivate final var __isCompleted : Bool {
         return (self.__result != nil)
     }
 
@@ -639,7 +639,7 @@ public class Future<T> : FutureProtocol {
         
         let p = Promise<T>()
         p.automaticallyCancelOnRequestCancel()
-        let _ = executor.executeAfterDelay(secs: delay) { () -> Void in
+        let _ = executor.executeAfterDelay(delay) { () -> Void in
             p.complete(completeWith)
         }
         self.init(completeUsing:p.future)
@@ -650,7 +650,7 @@ public class Future<T> : FutureProtocol {
 
         let p = Promise<T>()
         p.automaticallyCancelOnRequestCancel()
-        let _ = executor.executeAfterDelay(secs: afterDelay) {
+        let _ = executor.executeAfterDelay(afterDelay) {
             p.completeWithSuccess(success)
         }
         self.init(completeUsing:p.future)
@@ -929,7 +929,7 @@ public class Future<T> : FutureProtocol {
    
     - parameter callback: a callback block to be run if and when the future is complete
    */
-    private final func runThisCompletionBlockNowOrLater<S>(_ callback : @escaping completion_block_type,promise: Promise<S>) {
+    fileprivate final func runThisCompletionBlockNowOrLater<S>(_ callback : @escaping completion_block_type,promise: Promise<S>) {
         
         // lock my object, and either return the current completion value (if it's set)
         // or add the block to the __callbacks if not.
@@ -1145,7 +1145,7 @@ public class Future<T> : FutureProtocol {
     public final func onComplete<C: CompletionType>(_ executor : Executor,block:@escaping (FutureResult<T>) throws -> C) -> Future<C.T> {
         
         let (promise, completionCallback) = self.createPromiseAndCallback(block)
-        let block = executor.callbackBlockFor(block: completionCallback)
+        let block = executor.callbackBlockFor(completionCallback)
         
         self.runThisCompletionBlockNowOrLater(block,promise: promise)
         
@@ -1252,7 +1252,7 @@ extension FutureProtocol {
                 })
             }
             
-            executor.executeAfterDelay(secs: timeout)  {
+            executor.executeAfterDelay(timeout)  {
                 p.completeWithBlock { () -> C in
                     return try timedOut()
                 }
@@ -1289,7 +1289,7 @@ extension FutureProtocol {
                 p.completeWithSuccess(try didSucceed(result))
             }.ignoreFailures()
             
-            executor.executeAfterDelay(secs: timeout)  {
+            executor.executeAfterDelay(timeout)  {
                 p.completeWithBlock { () -> C in
                     return try timedOut()
                 }

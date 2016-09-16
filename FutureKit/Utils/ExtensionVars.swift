@@ -93,8 +93,8 @@ class UnSafeMutableContainer<T> {
 // to a class
 public struct ExtensionVarHandlerFor<A : AnyObject> {
     
-    private var keyValue = UnSafeMutableContainer<Int8>(0)
-    private var key : UnsafeMutablePointer<Int8>  { get { return keyValue.unsafe_pointer } }
+    fileprivate var keyValue = UnSafeMutableContainer<Int8>(0)
+    fileprivate var key : UnsafeMutablePointer<Int8>  { get { return keyValue.unsafe_pointer } }
     
     
     public init() {

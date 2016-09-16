@@ -17,11 +17,11 @@ class FKTestCase : BlockBasedTestCase {
 
     override func expectation(withDescription description: String) -> XCTestExpectation {
         current_expecatation_count += 1
-        return super.expectation(withDescription: description)
+        return super.expectation(description: description)
     }
     
     override func waitForExpectations(withTimeout timeout: TimeInterval, handler handlerOrNil: XCWaitCompletionHandler!) {
-        super.waitForExpectations(withTimeout: timeout, handler: handlerOrNil)
+        super.waitForExpectations(timeout: timeout, handler: handlerOrNil)
         self.current_expecatation_count = 0
     }
 
@@ -80,7 +80,7 @@ private enum PromiseState<T : Equatable> :  CustomStringConvertible, CustomDebug
         let future = promise.future
         
         switch self {
-        case notCompleted:
+        case .notCompleted:
             break
             
         case let .success(expectedValue):
@@ -190,7 +190,7 @@ private enum PromiseState<T : Equatable> :  CustomStringConvertible, CustomDebug
     func validate(_ promise : Promise<T>,testCase : FKTestCase,testVars: PromiseTestCase<T>, name : String) { // validate promise in this state
         
         switch self {
-        case notCompleted:
+        case .notCompleted:
             XCTAssert(!promise.isCompleted, "Promise is not in state \(self)")
             
         default:

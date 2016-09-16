@@ -46,7 +46,7 @@ extension ErrorTypeMightBeCancellation {
 // This is a protocol that helps you figure out if an ErrorType REALLY IS an NSError
 // since error as NSError always works in swift, we will use a protocol test.
 public protocol NSErrorType : ErrorTypeMightBeCancellation {
-    var userInfo: [NSObject : AnyObject] { get }
+    var userInfo: [AnyHashable: Any] { get }
     var domain: String { get }
     var code: Int { get }
     

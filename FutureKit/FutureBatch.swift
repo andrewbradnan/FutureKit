@@ -32,25 +32,25 @@ import Foundation
 
 public typealias FutureBatch = FutureBatchOf<Any>
 
-public class FutureBatchOf<T> {
+open class FutureBatchOf<T> {
     
     /**
     
     */
     internal(set) var subFutures  = [Future<T>]()
-    private var tokens = [CancellationToken]()
+    fileprivate var tokens = [CancellationToken]()
 
     /** 
         `completionsFuture` returns an array of individual Completion<T> values
         - returns: a `Future<[Completion<T>]>` always returns with a Success.  Returns an array of the individual Future.Completion values for each subFuture.
     */
-    public internal(set) var resultsFuture : Future<[FutureResult<T>]>
+    open internal(set) var resultsFuture : Future<[FutureResult<T>]>
     
 
     /**
         batchFuture succeeds iff all subFutures succeed. The result is an array `[T]`.  it does not complete until all futures have been completed within the batch (even if some fail or are cancelled).
     */
-    public internal(set) lazy var batchFuture : Future<[T]> = FutureBatchOf.futureFromResultsFuture(self.resultsFuture)
+    open internal(set) lazy var batchFuture : Future<[T]> = FutureBatchOf.futureFromResultsFuture(self.resultsFuture)
     
     /**
         `future` succeeds iff all subfutures succeed.  Will complete with a Fail or Cancel as soon as the first sub future is failed or cancelled.
@@ -59,7 +59,7 @@ public class FutureBatchOf<T> {
         If it's important to know that all Futures have completed, you can alertnatively use `batchFuture` and  `cancelRemainingFuturesOnFirstFail()` or `cancelRemainingFuturesOnFirstFailOrCancel()`.  batchFuture will always wait for all subFutures to complete before finishing, but will wait for the cancellations to be processed before exiting.
         this wi
     */
-    public internal(set) lazy var future : Future<[T]> = self._onFirstFailOrCancel()
+    open internal(set) lazy var future : Future<[T]> = self._onFirstFailOrCancel()
 
     
     /**
@@ -142,7 +142,7 @@ public class FutureBatchOf<T> {
     
     typealias FailOrCancelHandler = (FutureResult<T>, Future<T>, Int) -> Void
 
-    private final func _onFirstFailOrCancel(_ executor : Executor = .immediate,
+    fileprivate final func _onFirstFailOrCancel(_ executor : Executor = .immediate,
                             ignoreCancel:Bool = false,
                             block:FailOrCancelHandler? = nil) -> Future<[T]> {
         
@@ -221,7 +221,7 @@ public class FutureBatchOf<T> {
         - parameter array: array of Futures
         - returns: an array of Futures converted to return type <S>
     */
-    public class func convertArray<__Type>(_ array:[Future<T>]) -> [Future<__Type>] {
+    open class func convertArray<__Type>(_ array:[Future<T>]) -> [Future<__Type>] {
         var futures = [Future<__Type>]()
         for a in array {
             futures.append(a.mapAs())
@@ -238,7 +238,7 @@ public class FutureBatchOf<T> {
         - parameter array: array of Futures
         - returns: an array of Futures converted to return type <S>
     */
-    public class func convertArray<__Type>(_ array:[AnyFuture]) -> [Future<__Type>] {
+    open class func convertArray<__Type>(_ array:[AnyFuture]) -> [Future<__Type>] {
         
         return array.map { $0.mapAs() }
         
@@ -254,7 +254,7 @@ public class FutureBatchOf<T> {
         - parameter array: an array of Futures of type `[T]`.
         - returns: a single future that returns an array of `Completion<T>` values.
     */
-    public class func resultsFuture(_ array : [Future<T>]) -> Future<[FutureResult<T>]> {
+    open class func resultsFuture(_ array : [Future<T>]) -> Future<[FutureResult<T>]> {
         if (array.count == 0) {
             return Future<[FutureResult<T>]>(success: [])
         }
@@ -297,7 +297,7 @@ public class FutureBatchOf<T> {
     - parameter a: completions future of type  `Future<[Completion<T>]>`
     - returns: a single future that returns an array an array of `[T]`.
     */
-    public class func futureFromResultsFuture<T>(_ f : Future<[FutureResult<T>]>) -> Future<[T]> {
+    open class func futureFromResultsFuture<T>(_ f : Future<[FutureResult<T>]>) -> Future<[T]> {
         
         return f.onSuccess { (values) -> Completion<[T]> in
             var results = [T]()

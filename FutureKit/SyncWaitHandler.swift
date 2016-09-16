@@ -30,9 +30,9 @@ public func warnOperationOnMainThread() {
 
 class SyncWaitHandler<T>  {
     
-    private var condition : NSCondition = NSCondition()
+    fileprivate var condition : NSCondition = NSCondition()
     
-    private var value : FutureResult<T>?
+    fileprivate var value : FutureResult<T>?
     
     init<F:FutureProtocol>(waitingOnFuture f: F) where F.T == T {
         f.onComplete { (v) -> Void in

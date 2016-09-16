@@ -30,9 +30,9 @@ public enum CancelRequestResponse<T> {
 }
 
 
-public class Promise<T>  {
+open class Promise<T>  {
     
-    public var future : Future<T>
+    open var future : Future<T>
 
     public init() {
         self.future = Future<T>()
@@ -103,14 +103,14 @@ public class Promise<T>  {
     
     public final func automaticallyCancelAfter(_ delay: TimeInterval) {
         self.automaticallyCancelOnRequestCancel()
-        let _ = Executor._default.executeAfterDelay(secs: delay) { () -> Void in
+        let _ = Executor._default.executeAfterDelay(delay) { () -> Void in
             self.completeWithCancel()
         }
     }
 
     public final func automaticallyFailAfter(_ delay: TimeInterval, error:Error) {
         self.automaticallyCancelOnRequestCancel()
-        let _ = Executor._default.executeAfterDelay(secs: delay) { () -> Void in
+        let _ = Executor._default.executeAfterDelay(delay) { () -> Void in
             self.failIfNotCompleted(error)
         }
     }
@@ -134,7 +134,7 @@ public class Promise<T>  {
             }
             
         }
-        let wrappedNewHandler = Executor.primary.callbackBlockFor(block: newHandler)
+        let wrappedNewHandler = Executor.primary.callbackBlockFor(newHandler)
         self.future.addRequestHandler(wrappedNewHandler)
         
     }
@@ -203,7 +203,7 @@ public class Promise<T>  {
         return false
     }
 
-    public var isCompleted : Bool {
+    open var isCompleted : Bool {
         get {
             return self.future.isCompleted
         }

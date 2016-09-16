@@ -214,7 +214,7 @@ public enum SynchronizationType : CustomStringConvertible, CustomDebugStringConv
 
 }
 
-public class QueueBarrierSynchronization : SynchronizationProtocol {
+open class QueueBarrierSynchronization : SynchronizationProtocol {
     
     var q : DispatchQueue
     
@@ -231,7 +231,7 @@ public class QueueBarrierSynchronization : SynchronizationProtocol {
         self.q = q.createQueue("QueueBarrierSynchronization", q_attr: type, relative_priority: p)
     }
 
-    public func lockAndModify<T>(
+    open func lockAndModify<T>(
         waitUntilDone wait: Bool,
         modifyBlock:@escaping () -> T,
         then : ((T) -> Void)?) {
@@ -250,7 +250,7 @@ public class QueueBarrierSynchronization : SynchronizationProtocol {
         }
     }
 
-    public func lockAndRead<T>(
+    open func lockAndRead<T>(
         waitUntilDone wait: Bool,
         readBlock:@escaping () -> T,
         then : ((T) -> Void)?) {
@@ -270,7 +270,7 @@ public class QueueBarrierSynchronization : SynchronizationProtocol {
     }
 }
 
-public class QueueSerialSynchronization : SynchronizationProtocol {
+open class QueueSerialSynchronization : SynchronizationProtocol {
     
     var q : DispatchQueue
     
@@ -322,7 +322,7 @@ public class QueueSerialSynchronization : SynchronizationProtocol {
     
 }
 
-public class NSObjectLockSynchronization : SynchronizationProtocol {
+open class NSObjectLockSynchronization : SynchronizationProtocol {
 
     var lock : AnyObject
     
@@ -372,7 +372,7 @@ func synchronizedWithLock<T>(_ l: NSLocking, closure: ()->T) -> T {
 }
 
 
-public class NSLockSynchronization : SynchronizationProtocol {
+open class NSLockSynchronization : SynchronizationProtocol {
     
     var lock = NSLock()
     
@@ -416,7 +416,7 @@ func synchronizedWithMutexLock<T>(_ mutex: UnsafeMutablePointer<pthread_mutex_t>
     return retVal
 }
 
-public class PThreadMutexSynchronization : SynchronizationProtocol {
+open class PThreadMutexSynchronization : SynchronizationProtocol {
     
 
     var mutex_container: UnSafeMutableContainer<pthread_mutex_t>
@@ -465,7 +465,7 @@ public class PThreadMutexSynchronization : SynchronizationProtocol {
     }
 }
 
-public class NSRecursiveLockSynchronization : SynchronizationProtocol {
+open class NSRecursiveLockSynchronization : SynchronizationProtocol {
     
     var lock = NSRecursiveLock()
 
@@ -478,7 +478,7 @@ public class NSRecursiveLockSynchronization : SynchronizationProtocol {
         }
     }
     
-    public func lockAndModify<T>(
+    open func lockAndModify<T>(
         waitUntilDone wait: Bool,
         modifyBlock: @escaping () -> T,
         then : ((T) -> Void)?) {
@@ -507,7 +507,7 @@ public class NSRecursiveLockSynchronization : SynchronizationProtocol {
 // Useful for implementing a muteable-to-immuteable design pattern in your objects.
 // You replace the Synchroniztion object once your object reaches an immutable state.
 // USE WITH CARE.
-public class UnsafeSynchronization : SynchronizationProtocol {
+open class UnsafeSynchronization : SynchronizationProtocol {
     
     required public init() {
     }
@@ -536,7 +536,7 @@ public class UnsafeSynchronization : SynchronizationProtocol {
 }
 
 
-public class CollectionAccessControl<C : MutableCollection, S: SynchronizationProtocol> {
+open class CollectionAccessControl<C : MutableCollection, S: SynchronizationProtocol> {
     
     public typealias Index  = C.Index
     public typealias Element = C.Iterator.Element
@@ -549,7 +549,7 @@ public class CollectionAccessControl<C : MutableCollection, S: SynchronizationPr
         self.syncObject = s
     }
 
-    public func getValue(_ key : Index) -> Future<Element> {
+    open func getValue(_ key : Index) -> Future<Element> {
         return self.syncObject.readFuture(executor: .primary) { () -> Element in
             return self.collection[key]
         }
@@ -570,7 +570,7 @@ public class CollectionAccessControl<C : MutableCollection, S: SynchronizationPr
 
 }
 
-public class DictionaryWithSynchronization<Key : Hashable, Value, S: SynchronizationProtocol> {
+open class DictionaryWithSynchronization<Key : Hashable, Value, S: SynchronizationProtocol> {
     
     public typealias Index  = Key
     public typealias Element = Value
@@ -594,13 +594,13 @@ public class DictionaryWithSynchronization<Key : Hashable, Value, S: Synchroniza
         self.syncObject = s
     }
     
-    public func getValue(_ key : Key) -> Future<Value?> {
+    open func getValue(_ key : Key) -> Future<Value?> {
         return self.syncObject.readFuture(executor: .primary) { () -> Value? in
             return self.dictionary[key]
         }
     }
 
-    public func getValueSync(_ key : Key) -> Value? {
+    open func getValueSync(_ key : Key) -> Value? {
         let value = self.syncObject.lockAndReadSync { () -> Element? in
             let e = self.dictionary[key]
             return e
@@ -608,19 +608,19 @@ public class DictionaryWithSynchronization<Key : Hashable, Value, S: Synchroniza
         return value
     }
 
-    public func setValue(_ value: Value, forKey key: Key) -> Future<Any> {
+    open func setValue(_ value: Value, forKey key: Key) -> Future<Any> {
         return self.syncObject.modifyFuture(executor: .primary) { () -> Any in
             self.dictionary[key] = value
         }
     }
 
-    public func updateValue(_ value: Value, forKey key: Key) -> Future<Value?> {
+    open func updateValue(_ value: Value, forKey key: Key) -> Future<Value?> {
         return self.syncObject.modifyFuture(executor: .primary) { () -> Value? in
             return self.dictionary.updateValue(value, forKey: key)
         }
     }
 
-    public var count: Int {
+    open var count: Int {
         get {
             return self.syncObject.lockAndReadSync { () -> Int in
                 return self.dictionary.count
@@ -628,7 +628,7 @@ public class DictionaryWithSynchronization<Key : Hashable, Value, S: Synchroniza
         }
     }
     
-    public var isEmpty: Bool {
+    open var isEmpty: Bool {
         get {
             return self.syncObject.lockAndReadSync { () -> Bool in
                 return self.dictionary.isEmpty
@@ -654,7 +654,7 @@ public class DictionaryWithSynchronization<Key : Hashable, Value, S: Synchroniza
 }
 
 
-public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : CollectionAccessControl< Array<T> , S> {
+open class ArrayWithSynchronization<T, S: SynchronizationProtocol> : CollectionAccessControl< Array<T> , S> {
     
     var array : Array<T> {
         get {
@@ -675,7 +675,7 @@ public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : Collectio
     }
     
     
-    public var count: Int {
+    open var count: Int {
         get {
             return self.syncObject.lockAndReadSync { () -> Int in
                 return self.collection.count
@@ -683,7 +683,7 @@ public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : Collectio
         }
     }
 
-    public var isEmpty: Bool {
+    open var isEmpty: Bool {
         get {
             return self.syncObject.lockAndReadSync { () -> Bool in
                 return self.collection.isEmpty
@@ -691,14 +691,14 @@ public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : Collectio
         }
     }
 
-    public var first: T? {
+    open var first: T? {
         get {
             return self.syncObject.lockAndReadSync { () -> T? in
                 return self.collection.first
             }
         }
     }
-    public var last: T? {
+    open var last: T? {
         get {
             return self.syncObject.lockAndReadSync { () -> T? in
                 return self.collection.last
@@ -713,31 +713,31 @@ public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : Collectio
     } */
 
     
-    public func getValue(atIndex i: Int) -> Future<T> {
+    open func getValue(atIndex i: Int) -> Future<T> {
         return self.syncObject.readFuture(executor: .primary) { () -> T in
             return self.collection[i]
         }
     }
 
-    public func append(_ newElement: T) {
+    open func append(_ newElement: T) {
         self.syncObject.lockAndModify {
             self.collection.append(newElement)
         }
     }
     
-    public func removeLast() -> T {
+    open func removeLast() -> T {
         return self.syncObject.lockAndModifySync {
             self.collection.removeLast()
         }
     }
     
-    public func insert(_ newElement: T, atIndex i: Int) {
+    open func insert(_ newElement: T, atIndex i: Int) {
         self.syncObject.lockAndModify {
             self.collection.insert(newElement,at: i)
         }
     }
     
-    public func removeAtIndex(_ index: Int) -> T {
+    open func removeAtIndex(_ index: Int) -> T {
         return self.syncObject.lockAndModifySync {
             self.collection.remove(at: index)
         }
@@ -746,7 +746,7 @@ public class ArrayWithSynchronization<T, S: SynchronizationProtocol> : Collectio
 
 }
 
-public class DictionaryWithFastLockAccess<Key : Hashable, Value> : DictionaryWithSynchronization<Key,Value,SynchronizationType.LightAndFastSyncType> {
+open class DictionaryWithFastLockAccess<Key : Hashable, Value> : DictionaryWithSynchronization<Key,Value,SynchronizationType.LightAndFastSyncType> {
     
     typealias LockObjectType = SynchronizationType.LightAndFastSyncType
     
@@ -759,7 +759,7 @@ public class DictionaryWithFastLockAccess<Key : Hashable, Value> : DictionaryWit
     
 }
 
-public class DictionaryWithBarrierAccess<Key : Hashable, Value> : DictionaryWithSynchronization<Key,Value,QueueBarrierSynchronization> {
+open class DictionaryWithBarrierAccess<Key : Hashable, Value> : DictionaryWithSynchronization<Key,Value,QueueBarrierSynchronization> {
 
     typealias LockObjectType = QueueBarrierSynchronization
 
@@ -773,7 +773,7 @@ public class DictionaryWithBarrierAccess<Key : Hashable, Value> : DictionaryWith
 
 
 
-public class ArrayWithFastLockAccess<T> : ArrayWithSynchronization<T,SynchronizationType.LightAndFastSyncType> {
+open class ArrayWithFastLockAccess<T> : ArrayWithSynchronization<T,SynchronizationType.LightAndFastSyncType> {
     
     override public init() {
         super.init(array: Array<T>(), SynchronizationType.LightAndFastSyncType())

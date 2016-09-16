@@ -1,14 +1,14 @@
 Pod::Spec.new do |s|
   s.name = 'FutureKit'
-  s.version = '2.0.0'
+  s.version = '3.0.1'
   s.license = 'MIT'
   s.summary = 'A Swift based Future/Promises Library for IOS and OS X.'
   s.homepage = 'https://github.com/FutureKit/FutureKit'
   s.social_media_url = 'http://twitter.com/swiftfuturekit'
   s.authors = { 'Michael Gray' => 'michael@futurekit.org' }
-  s.source = { :git => 'https://github.com/FutureKit/FutureKit.git', :tag => s.version }
+  s.source = { :git => 'https://github.com/andrewbradnan/FutureKit.git', :tag => s.version }
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '10.0'
   s.tvos.deployment_target = '9.0'
   s.watchos.deployment_target = '2.0'
   s.osx.deployment_target = '10.10'

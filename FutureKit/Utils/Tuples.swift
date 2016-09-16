@@ -12,7 +12,7 @@ import Foundation
 // This will extend 'indexable' collections, like Arrays to allow some conviences tuple implementations
 public extension Sequence where Self:Indexable, Self.Index : ExpressibleByIntegerLiteral {
     
-    private func _get_element<T>(_ index : Index) -> T {
+    fileprivate func _get_element<T>(_ index : Index) -> T {
         let x = self[index]
         let t = x as? T
         assert(t != nil, "did not find type \(T.self) at index \(index) of \(Self.self)")
@@ -132,7 +132,7 @@ public extension Sequence where Self:Indexable, Self.Index : ExpressibleByIntege
 
 public extension Sequence  { // Some sequences don't have integer indexes, so we will use generators.
     
-    private func _get_element<T>(_ generator : inout Iterator) -> T {
+    fileprivate func _get_element<T>(_ generator : inout Iterator) -> T {
         let x = generator.next()
         assert(x != nil, "toTuple() did not find enough values inside \(Self.self)")
         let t = x! as? T

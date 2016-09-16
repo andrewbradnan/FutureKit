@@ -30,10 +30,10 @@ extension XCTestCase {
     func expectationTestForFutureCompletion<T>(_ description : String, future f: Future<T>,
         file: StaticString = #file,
         line: UInt = #line,
-        assertion : ((value : FutureResult<T>) -> (assert:Boolean,message:String))
+        assertion : ((_ value : FutureResult<T>) -> (assert:Boolean,message:String))
         ) -> XCTestExpectation! {
             
-            let e = self.expectation(withDescription: description)
+            let e = self.expectation(description: description)
             
             f.onComplete { (value) -> Void in
                 let test = assertion(value:value)
@@ -47,7 +47,7 @@ extension XCTestCase {
     func expectationTestForFutureSuccess<T>(_ description : String,future f: Future<T>,
         file: StaticString = #file,
         line: UInt = #line,
-        test : ((result:T) -> Boolean)
+        test : @escaping ((_ result:T) -> DarwinBoolean)
         ) -> XCTestExpectation! {
         
             return self.expectationTestForFutureCompletion(description,future: f, file:file,line:line)  { (value : FutureResult<T>) -> (assert: Boolean, message: String) in

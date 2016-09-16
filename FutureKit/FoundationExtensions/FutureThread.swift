@@ -8,19 +8,19 @@
 
 import Foundation
 
-public class FutureThread {
+open class FutureThread {
     
     public typealias __Type = Any
     
     var block: () -> Completion<__Type>
     
-    private var promise = Promise<__Type>()
+    fileprivate var promise = Promise<__Type>()
     
-    public var future: Future<__Type> {
+    open var future: Future<__Type> {
         return promise.future
     }
     
-    private var thread : Thread!
+    fileprivate var thread : Thread!
     
     public init(block b: @escaping () -> __Type) {
         self.block = { () -> Completion<__Type> in
@@ -40,11 +40,11 @@ public class FutureThread {
         self.thread = Thread(target: self, selector: #selector(FutureThread.thread_func), object: nil)
     }
     
-    @objc public func thread_func() {
+    @objc open func thread_func() {
         self.promise.complete(self.block())
     }
     
-    public func start() {
+    open func start() {
         self.thread.start()
     }
    

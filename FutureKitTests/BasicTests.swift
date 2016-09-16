@@ -149,11 +149,11 @@ class FutureKitBasicTests: XCTestCase {
         let val = 5
         let f = Future<Int>(success: val)
         
-        self.expectationTestForFutureSuccess("AsyncMadness", future: f) { (result:Int) -> Boolean in
+        self.expectationTestForFutureSuccess("AsyncMadness", future: f) { (result:Int) -> DarwinBoolean in
             return (result == val)
         }
         
-        self.waitForExpectations(withTimeout: 30.0, handler: nil)
+        self.waitForExpectations(timeout: 30.0, handler: nil)
         
         
     }
@@ -161,7 +161,7 @@ class FutureKitBasicTests: XCTestCase {
         var i = 0
         iWillKeepTryingTillItWorks(i).expectationTestForAnySuccess(self, description: "Description")
         
-        self.waitForExpectations(withTimeout: 120.0, handler: nil)
+        self.waitForExpectations(timeout: 120.0, handler: nil)
         
     }
     
